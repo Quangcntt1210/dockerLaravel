@@ -1,4 +1,6 @@
 <?php
+use App\Jobs\NewJob;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
@@ -15,8 +17,16 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
-    
+
 });
 Route::get('/test-db', function () {
-    return \DB::table('users')->get();
+    return DB::table('users')->get();
+});
+
+Route::get('/send-mail', function () {
+    $users = User::get();
+    foreach ($users as $user) {
+        NewJob::dispatch($user->email, $user->name);
+    }
+    return 'Đã đưa ' . count($users) . ' job vào Redis queue!';
 });
